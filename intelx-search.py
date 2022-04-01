@@ -4,7 +4,6 @@
 
 import requests
 import sys
-import os
 import socks
 import socket
 import argparse
@@ -53,7 +52,10 @@ output = args.output
 limit = args.limit
 socks_ip = args.socks
 socks_port = args.socks_port
-api_key = os.popen('''curl -s -H "User-Agent: Mozilla/5.0" https://phonebook.cz | grep 'var API_KEY' | awk '{print $4}' | sed "s/'//g" | sed "s/;//g"''').read().replace("\n","") # Lazy way to get latest API key.
+r_api_key = requests.get("https://phonebook.cz",headers={"User-Agent":"Mozilla/5.0"}) # Requsts latest api key from phonebook.cz.
+for line in r_api_key.text.split("\n"):
+    if "var API_KEY" in line:
+        api_key = line.replace("var API_KEY = '","").replace("';","").replace(" ","").strip() # Strip api key from request text.
 api_url = 'public.intelx.io'
 headers = {"User-Agent": "Mozilla/5.0", "Accept-Encoding": "gzip, deflate", "Accept": "*/*", "Origin": "https://phonebook.cz", "Referer": "https://phonebook.cz/", "Content-Type": "application/x-www-form-urlencoded"}
 
